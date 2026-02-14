@@ -37,11 +37,9 @@ function Profile() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mutations
-  const [updateInfo, { isLoading: isUpdatingInfo }] =
-    useUpdateUserInfoMutation();
+  const [updateInfo, { isLoading: isUpdatingInfo }] = useUpdateUserInfoMutation();
   const [updatePwd, { isLoading: isUpdatingPwd }] = useUpdateUserPwdMutation();
-  const [updateAvatar, { isLoading: isUploading }] =
-    useUpdateUserAvatarMutation();
+  const [updateAvatar, { isLoading: isUploading }] = useUpdateUserAvatarMutation();
 
   // Form States
   const [infoForm, setInfoForm] = useState({
@@ -99,36 +97,38 @@ function Profile() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-800 tracking-tight">
+    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8 px-4 sm:px-0 pb-10">
+      {/* Header Section */}
+      <div className="text-center md:text-left">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
           Account Settings
         </h1>
-        <p className="text-slate-500">
+        <p className="text-slate-500 text-sm md:text-base">
           Manage your profile, security, and preferences
         </p>
       </div>
 
-<div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        
         {/* Left Column: Avatar & Summary */}
-        <Card className="md:col-span-1 h-fit rounded-2xl border-slate-200 shadow-sm">
-          <CardContent className="pt-8 flex flex-col items-center text-center">
+        <Card className="md:col-span-1 h-fit rounded-2xl border-slate-200 shadow-sm overflow-hidden">
+          <CardContent className="pt-8 pb-6 flex flex-col items-center text-center">
             <div className="relative group">
-              <Avatar className="w-32 h-32 border-4 border-white shadow-xl">
+              <Avatar className="w-24 h-24 md:w-32 md:h-32 border-4 border-white shadow-xl">
                 <AvatarImage className="object-cover" src={user?.avatar} />
-                <AvatarFallback className="bg-indigo-100 text-indigo-600 text-3xl font-bold">
+                <AvatarFallback className="bg-indigo-100 text-indigo-600 text-2xl md:text-3xl font-bold">
                   {user?.name?.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="absolute bottom-0 right-0 p-2 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition-all disabled:opacity-50"
+                className="absolute bottom-0 right-0 p-2 md:p-2.5 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition-all disabled:opacity-50"
               >
                 {isUploading ? (
-                  <Loader2 size={18} className="animate-spin" />
+                  <Loader2 size={16} className="animate-spin" />
                 ) : (
-                  <Camera size={18} />
+                  <Camera size={16} />
                 )}
               </button>
               <input
@@ -140,18 +140,17 @@ function Profile() {
               />
             </div>
 
-            <h2 className="mt-4 text-xl font-bold text-slate-800">
+            <h2 className="mt-4 text-lg md:text-xl font-bold text-slate-800">
               {user?.name}
             </h2>
-            <p className="text-slate-500 text-sm flex items-center gap-1">
-              <ShieldCheck size={14} className="text-indigo-500" />
+            <div className="mt-1 flex items-center justify-center gap-1.5 py-1 px-3 bg-indigo-50 text-indigo-700 rounded-full text-xs font-semibold">
+              <ShieldCheck size={14} />
               {user?.role === 2 ? "Administrator" : user?.role === 1 ? "Staff" : "User Account"}
-            </p>
+            </div>
           </CardContent>
-          <CardFooter className="bg-slate-50/50 flex justify-center py-4 rounded-b-2xl border-t border-slate-100">
-            <p className="text-xs text-slate-400">
-              Member since{" "}
-              {user?.createdAt && new Date(user.createdAt).toLocaleDateString()}
+          <CardFooter className="bg-slate-50/50 flex justify-center py-4 border-t border-slate-100">
+            <p className="text-[10px] md:text-xs text-slate-400">
+              Member since {user?.createdAt && new Date(user.createdAt).toLocaleDateString()}
             </p>
           </CardFooter>
         </Card>
@@ -159,80 +158,67 @@ function Profile() {
         {/* Right Column: Detailed Forms */}
         <div className="md:col-span-2">
           <Tabs defaultValue="general" className="w-full">
-            <TabsList className="bg-slate-100 p-1 rounded-xl mb-2">
+            <TabsList className="grid grid-cols-2 bg-slate-100 p-1 rounded-xl mb-6">
               <TabsTrigger
                 value="general"
-                className="rounded-lg gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                className="rounded-lg gap-2 text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm py-2.5"
               >
-                <User size={16} /> General
+                <User size={16} /> <span className="hidden sm:inline">General</span>
+                <span className="sm:hidden">Info</span>
               </TabsTrigger>
               <TabsTrigger
                 value="security"
-                className="rounded-lg gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                className="rounded-lg gap-2 text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm py-2.5"
               >
-                <Lock size={16} /> Security
+                <Lock size={16} /> <span className="hidden sm:inline">Security</span>
+                <span className="sm:hidden">Pwd</span>
               </TabsTrigger>
             </TabsList>
 
-<TabsContent value="general">
+            <TabsContent value="general" className="mt-0 outline-none">
               <Card className="rounded-2xl border-slate-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle>Personal Information</CardTitle>
-                  <CardDescription>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg md:text-xl">Personal Information</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">
                     Update your name and contact details here.
                   </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleInfoUpdate}>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Full Name</Label>
+                      <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
                       <div className="relative">
-                        <User
-                          className="absolute left-3 top-2.5 text-slate-400"
-                          size={18}
-                        />
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                         <Input
                           id="name"
-                          className="pl-10"
+                          className="pl-10 h-11 rounded-xl"
                           value={infoForm.name}
-                          onChange={(e) =>
-                            setInfoForm({ ...infoForm, name: e.target.value })
-                          }
+                          onChange={(e) => setInfoForm({ ...infoForm, name: e.target.value })}
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
+                      <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
                       <div className="relative">
-                        <Mail
-                          className="absolute left-3 top-2.5 text-slate-400"
-                          size={18}
-                        />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                         <Input
                           id="email"
-                          className="pl-10"
+                          className="pl-10 h-11 rounded-xl"
                           value={infoForm.email}
-                          onChange={(e) =>
-                            setInfoForm({ ...infoForm, email: e.target.value })
-                          }
+                          onChange={(e) => setInfoForm({ ...infoForm, email: e.target.value })}
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
+                      <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
                       <div className="relative">
-                        <Phone
-                          className="absolute left-3 top-2.5 text-slate-400"
-                          size={18}
-                        />
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                         <Input
                           id="phone"
-                          className="pl-10"
+                          className="pl-10 h-11 rounded-xl"
                           placeholder="+1 234 567 890"
                           value={infoForm.phone}
-                          onChange={(e) =>
-                            setInfoForm({ ...infoForm, phone: e.target.value })
-                          }
+                          onChange={(e) => setInfoForm({ ...infoForm, phone: e.target.value })}
                         />
                       </div>
                     </div>
@@ -241,11 +227,9 @@ function Profile() {
                     <Button
                       type="submit"
                       disabled={isUpdatingInfo}
-                      className="bg-indigo-600 rounded-xl px-8 ml-auto"
+                      className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 rounded-xl px-8 ml-auto h-11"
                     >
-                      {isUpdatingInfo && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
+                      {isUpdatingInfo && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Save Changes
                     </Button>
                   </CardFooter>
@@ -253,57 +237,44 @@ function Profile() {
               </Card>
             </TabsContent>
 
-<TabsContent value="security">
+            <TabsContent value="security" className="mt-0 outline-none">
               <Card className="rounded-2xl border-slate-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle>Change Password</CardTitle>
-                  <CardDescription>
-                    Ensure your account is using a long, random password to stay
-                    secure.
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg md:text-xl">Change Password</CardTitle>
+                  <CardDescription className="text-xs md:text-sm">
+                    Ensure your account is using a secure password.
                   </CardDescription>
                 </CardHeader>
                 <form onSubmit={handlePwdUpdate}>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="old">Current Password</Label>
+                      <Label htmlFor="old" className="text-sm font-medium">Current Password</Label>
                       <Input
                         id="old"
                         type="password"
+                        className="h-11 rounded-xl"
                         value={pwdForm.oldPassword}
-                        onChange={(e) =>
-                          setPwdForm({
-                            ...pwdForm,
-                            oldPassword: e.target.value,
-                          })
-                        }
+                        onChange={(e) => setPwdForm({ ...pwdForm, oldPassword: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="new">New Password</Label>
+                      <Label htmlFor="new" className="text-sm font-medium">New Password</Label>
                       <Input
                         id="new"
                         type="password"
+                        className="h-11 rounded-xl"
                         value={pwdForm.newPassword}
-                        onChange={(e) =>
-                          setPwdForm({
-                            ...pwdForm,
-                            newPassword: e.target.value,
-                          })
-                        }
+                        onChange={(e) => setPwdForm({ ...pwdForm, newPassword: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="confirm">Confirm New Password</Label>
+                      <Label htmlFor="confirm" className="text-sm font-medium">Confirm New Password</Label>
                       <Input
                         id="confirm"
                         type="password"
+                        className="h-11 rounded-xl"
                         value={pwdForm.confirmPassword}
-                        onChange={(e) =>
-                          setPwdForm({
-                            ...pwdForm,
-                            confirmPassword: e.target.value,
-                          })
-                        }
+                        onChange={(e) => setPwdForm({ ...pwdForm, confirmPassword: e.target.value })}
                       />
                     </div>
                   </CardContent>
@@ -311,11 +282,9 @@ function Profile() {
                     <Button
                       type="submit"
                       disabled={isUpdatingPwd}
-                      className="bg-indigo-600 rounded-xl px-8 ml-auto"
+                      className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 rounded-xl px-8 ml-auto h-11"
                     >
-                      {isUpdatingPwd && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
+                      {isUpdatingPwd && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Update Password
                     </Button>
                   </CardFooter>

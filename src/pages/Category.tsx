@@ -47,14 +47,12 @@ function Category() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<TCategory | null>(null);
 
-  // Form State
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     type: ExpenseType.OUTCOME,
   });
 
-  // Handle Edit Click
   const handleEdit = (category: TCategory) => {
     setEditingCategory(category);
     setFormData({
@@ -65,7 +63,6 @@ function Category() {
     setIsOpen(true);
   };
 
-  // Reset Form
   const closeDialog = () => {
     setIsOpen(false);
     setEditingCategory(null);
@@ -100,19 +97,21 @@ function Category() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 pb-10">
+      {/* Header Section - Stacked on Mobile */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Categories</h1>
-          <p className="text-slate-500 text-sm">Manage your income and expense labels</p>
+          <h1 className="text-xl md:text-2xl font-bold text-slate-800">Categories</h1>
+          <p className="text-slate-500 text-xs md:text-sm">Manage your income and expense labels</p>
         </div>
+        
         <Dialog open={isOpen} onOpenChange={(val) => !val && closeDialog()}>
           <DialogTrigger asChild>
-            <Button className="bg-indigo-600 hover:bg-indigo-700 rounded-xl gap-2" onClick={() => setIsOpen(true)}>
-              <Plus size={18} /> Add Category
+            <Button className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 rounded-xl gap-2 shadow-md shadow-indigo-100" onClick={() => setIsOpen(true)}>
+              <Plus size={18} /> <span className="inline">Add Category</span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-106.25 rounded-2xl">
+          <DialogContent className="w-[95vw] max-w-md rounded-2xl sm:rounded-lg">
             <DialogHeader>
               <DialogTitle>{editingCategory ? "Edit Category" : "New Category"}</DialogTitle>
             </DialogHeader>
@@ -125,6 +124,7 @@ function Category() {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   required
+                  className="rounded-xl"
                 />
               </div>
               <div className="space-y-2">
@@ -134,6 +134,7 @@ function Category() {
                   placeholder="Short note..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="rounded-xl"
                 />
               </div>
               {!editingCategory && (
@@ -143,7 +144,7 @@ function Category() {
                     value={formData.type} 
                     onValueChange={(val) => setFormData({ ...formData, type: val as ExpenseType })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="rounded-xl">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -153,25 +154,55 @@ function Category() {
                   </Select>
                 </div>
               )}
-              <DialogFooter className="pt-4">
-                <Button type="button" variant="ghost" onClick={closeDialog}>Cancel</Button>
-                <Button type="submit" disabled={isCreating || isUpdating} className="bg-indigo-600">
-                  {(isCreating || isUpdating) && (
-                    <Loader />
-                  )}
-                  {editingCategory ? "Update Changes" : "Create Category"}
+              <DialogFooter className="flex-row gap-2 pt-4 sm:pt-0">
+                <Button type="button" variant="ghost" className="flex-1 sm:flex-none rounded-xl" onClick={closeDialog}>Cancel</Button>
+                <Button type="submit" disabled={isCreating || isUpdating} className="flex-1 sm:flex-none bg-indigo-600 rounded-xl">
+                  {(isCreating || isUpdating) && <Loader className="mr-2 h-4 w-4 animate-spin" />}
+                  {editingCategory ? "Update" : "Create"}
                 </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
       </div>
-      {/* Table Section */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+      {/* --- MOBILE VIEW (Card Layout) --- */}
+      <div className="grid grid-cols-1 gap-4 md:hidden">
+        {isLoading ? (
+           <p className="text-center py-10 text-slate-400">Loading...</p>
+        ) : data?.categories.map((category) => (
+          <div key={category._id} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-bold text-slate-800">{category.title}</h3>
+                <p className="text-xs text-slate-500 mt-1 line-clamp-2">{category.description || "No description"}</p>
+              </div>
+              <Badge variant="secondary" className={
+                category.type === ExpenseType.INCOME 
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-100" 
+                  : "bg-amber-50 text-amber-700 border-amber-100"
+              }>
+                {category.type}
+              </Badge>
+            </div>
+            <div className="flex gap-2 pt-2 border-t border-slate-50">
+              <Button variant="outline" className="flex-1 h-9 rounded-lg gap-2 text-slate-600" onClick={() => handleEdit(category)}>
+                <Pencil size={14} /> Edit
+              </Button>
+              <Button variant="outline" className="flex-1 h-9 rounded-lg gap-2 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => handleDelete(category._id)}>
+                <Trash2 size={14} /> Delete
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* --- DESKTOP VIEW (Table Layout) --- */}
+      <div className="hidden md:block bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <Table>
           <TableHeader className="bg-slate-50">
             <TableRow>
-              <TableHead className="w-75">Title</TableHead>
+              <TableHead className="w-1/3">Title</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Description</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -199,11 +230,11 @@ function Category() {
                     {category.description || "-"}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" className="text-slate-400 hover:text-indigo-600" onClick={() => handleEdit(category)}>
+                    <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="icon" className="text-slate-400 hover:text-indigo-600 h-8 w-8" onClick={() => handleEdit(category)}>
                         <Pencil size={16} />
                       </Button>
-                      <Button variant="ghost" size="icon" className="text-slate-400 hover:text-red-600" onClick={() => handleDelete(category._id)}>
+                      <Button variant="ghost" size="icon" className="text-slate-400 hover:text-red-600 h-8 w-8" onClick={() => handleDelete(category._id)}>
                         <Trash2 size={16} />
                       </Button>
                     </div>
